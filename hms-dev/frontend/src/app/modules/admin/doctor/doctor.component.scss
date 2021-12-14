@@ -1,0 +1,12 @@
+.doctor-grid {
+    grid-template-columns: auto 50px;
+    @screen sm {
+        grid-template-columns: 48px auto 112px 72px;
+    }
+    @screen md {
+        grid-template-columns: 600px 112px auto 112px 72px;
+    }
+    @screen lg {
+        grid-template-columns: auto 150px auto 150px 150px 96px;
+    }
+}

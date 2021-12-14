@@ -1,0 +1,556 @@
+<div
+    class="
+        sm:absolute sm:inset-0
+        flex flex-col flex-auto
+        min-w-0
+        sm:overflow-hidden
+        bg-card
+        dark:bg-transparent
+    "
+>
+    <!-- Header -->
+    <div
+        class="
+            relative
+            flex flex-col
+            sm:flex-row
+            flex-0
+            sm:items-center sm:justify-between
+            py-4
+            px-4
+            md:px-8
+            dark
+            bg-card
+            dark:border-b
+        "
+    >
+        <!-- Loader -->
+        <div class="absolute inset-x-0 bottom-0" *ngIf="isLoading">
+            <mat-progress-bar [mode]="'indeterminate'"></mat-progress-bar>
+        </div>
+        <!-- Title -->
+        <div class="text-4xl font-extrabold tracking-tight">Doctors</div>
+        <!-- Actions -->
+        <div class="flex flex-shrink-0 items-center mt-6 sm:mt-0 sm:ml-4">
+            <!-- Search -->
+            <mat-form-field
+                class="fuse-mat-dense fuse-mat-no-subscript min-w-50"
+            >
+                <mat-icon
+                    matPrefix
+                    [svgIcon]="'heroicons_outline:search'"
+                ></mat-icon>
+                <input
+                    matInput
+                    [formControl]="searchInputControl"
+                    [autocomplete]="'off'"
+                    [placeholder]="'Search'"
+                />
+            </mat-form-field>
+            <button
+                class="ml-4"
+                mat-flat-button
+                [color]="'primary'"
+                (click)="addDoctor()"
+            >
+                <mat-icon [svgIcon]="'heroicons_outline:plus'"></mat-icon>
+                <span class="ml-2 mr-1">Add</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+        <div
+            class="
+                flex flex-col flex-auto
+                sm:mb-18
+                overflow-hidden
+                sm:overflow-y-auto
+            "
+        >
+            <div class="grid">
+                <button
+                    type="button"
+                    id="gotoTop"
+                    style="border: none"
+                ></button>
+                <ng-container *ngIf="displayAddDoctorForm">
+                    <ng-container
+                        *ngTemplateOutlet="rowDetailsTemplate"
+                    ></ng-container>
+                </ng-container>
+            </div>
+            <ng-container *ngIf="doctors.length > 0; else noDoctor">
+                <div class="grid">
+                    <!-- Header -->
+                    <div
+                        class="
+                            doctor-grid
+                            z-10
+                            sticky
+                            top-0
+                            grid
+                            gap-4
+                            py-4
+                            px-6
+                            md:px-8
+                            shadow
+                            text-md
+                            font-semibold
+                            text-secondary
+                            bg-gray-50
+                            dark:bg-black dark:bg-opacity-5
+                        "
+                        matSort
+                        matSortDisableClear
+                    >
+                        <div>Image</div>
+                        <div [mat-sort-header]="'fullName'">Doctor Name</div>
+                        <div [mat-sort-header]="'email'">Email</div>
+                        <div [mat-sort-header]="'contact_number'">
+                            Mobile No.
+                        </div>
+                        <div [mat-sort-header]="'gender'">Gender</div>
+                        <div>Details</div>
+                    </div>
+                    <!-- Rows -->
+
+                    <ng-container
+                        *ngFor="let type of doctors; trackBy: trackByFn"
+                    >
+                        <div
+                            class="
+                                doctor-grid
+                                grid
+                                items-center
+                                gap-4
+                                py-3
+                                px-6
+                                md:px-8
+                                border-b
+                            "
+                        >
+                            <div class="flex items-center">
+                                <div
+                                    class="
+                                        relative
+                                        flex flex-0
+                                        items-center
+                                        justify-center
+                                        w-18
+                                        h-18
+                                        mr-6
+                                        rounded-full
+                                        overflow-hidden
+                                        border
+                                    "
+                                >
+                                    <img
+                                        class="w-full"
+                                        [src]="
+                                            imgPath +
+                                            'doctors/' +
+                                            type.profileImgUrl
+                                        "
+                                        *ngIf="type.profileImgUrl"
+                                        onerror="this.src='../../assets/images/no-image-icon.png'; type=''"
+                                    />
+                                    <div
+                                        class="
+                                            flex
+                                            items-center
+                                            justify-center
+                                            w-full
+                                            h-full
+                                            text-xs
+                                            font-semibold
+                                            leading-none
+                                            text-center
+                                            uppercase
+                                        "
+                                        *ngIf="!type.profileImgUrl"
+                                    >
+                                        NO THUMB
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Name -->
+                            <div class="truncate">
+                                {{ type.fullName }}
+                            </div>
+                            <div class="truncate">
+                                {{ type.email }}
+                            </div>
+                            <div class="truncate">
+                                {{ type.contact_number }}
+                            </div>
+                            <div class="truncate">
+                                {{ type.gender === "male" ? "Male" : "Female" }}
+                            </div>
+
+                            <!-- Details button -->
+                            <div>
+                                <button
+                                    class="min-w-10 min-h-7 h-7 px-2 leading-6"
+                                    mat-stroked-button
+                                    (click)="toggleDetails(type._id)"
+                                >
+                                    <mat-icon
+                                        class="icon-size-5"
+                                        [svgIcon]="
+                                            selectedType?._id === type._id
+                                                ? 'heroicons_solid:chevron-up'
+                                                : 'heroicons_solid:chevron-down'
+                                        "
+                                    >
+                                    </mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="grid">
+                            <ng-container
+                                *ngIf="selectedType?._id === type._id"
+                            >
+                                <ng-container
+                                    *ngTemplateOutlet="rowDetailsTemplate"
+                                ></ng-container>
+                            </ng-container>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <mat-paginator
+                    class="
+                        sm:absolute sm:inset-x-0 sm:bottom-0
+                        border-b
+                        sm:border-t sm:border-b-0
+                        z-10
+                        bg-gray-50
+                        dark:bg-transparent
+                    "
+                    [ngClass]="{ 'pointer-events-none': isLoading }"
+                    [length]="pagination.length"
+                    [pageIndex]="pagination.page"
+                    [pageSize]="pagination.size"
+                    [showFirstLastButtons]="true"
+                ></mat-paginator>
+            </ng-container>
+
+            <ng-template #rowDetailsTemplate>
+                <div class="shadow-lg overflow-hidden">
+                    <div class="flex border-b my-8">
+                        <form
+                            class="flex flex-col w-full"
+                            [formGroup]="doctorFormGroup"
+                        >
+                            <div class="flex flex-auto flex-wrap ml-8 mr-8">
+                                <div class="col">
+                                    <small class="text-red-500"
+                                        >*image size(255 X 400)</small
+                                    >
+                                    <div
+                                        class="
+                                            w-30
+                                            h-30
+                                            border
+                                            rounded
+                                            flex-col
+                                            overflow-hidden
+                                            fileselcet-center
+                                            mt-1
+                                        "
+                                    >
+                                        <ng-container *ngIf="selectedImage">
+                                            <img
+                                                class="w-full h-full"
+                                                [src]="
+                                                    imgPath +
+                                                    'doctors/' +
+                                                    selectedImage
+                                                "
+                                                onerror="this.src='../../assets/images/no-image-icon.png'; type=''"
+                                            />
+                                        </ng-container>
+                                        <ng-container *ngIf="!selectedImage">
+                                            <mat-icon
+                                                class="
+                                                    ml-3
+                                                    mt-3
+                                                    icon-size-24
+                                                    justify-center
+                                                "
+                                                [svgIcon]="
+                                                    'heroicons_solid:user-circle'
+                                                "
+                                            >
+                                            </mat-icon>
+                                        </ng-container>
+                                    </div>
+                                    <div class="items-center mt-3 text-center">
+                                        <span (click)="selectFile.click()">
+                                            <mat-icon
+                                                class="text-orange-500"
+                                                [svgIcon]="
+                                                    'add_photo_alternate'
+                                                "
+                                            >
+                                            </mat-icon>
+                                        </span>
+                                        <input
+                                            class="upload"
+                                            name="image"
+                                            type="file"
+                                            hidden
+                                            (change)="onFileUpload($event)"
+                                            #selectFile
+                                        />
+                                    </div>
+                                </div>
+                                <div
+                                    class="
+                                        flex flex-col
+                                        w-full
+                                        ml-4
+                                        lg:w-1/4
+                                        md:w-1/4
+                                        sm:w-1/4
+                                        lg:pr-2
+                                        md:pr-2
+                                        sm:pr-2
+                                    "
+                                >
+                                    <mat-form-field
+                                        [floatLabel]="'always'"
+                                        class="w-full"
+                                    >
+                                        <mat-label>Doctor Name</mat-label>
+                                        <input
+                                            matInput
+                                            [formControlName]="'fullName'"
+                                            placeholder="Doctor Name"
+                                            maxlength="30"
+                                        />
+                                        <mat-error
+                                            *ngIf="
+                                                doctorFormGroup
+                                                    .get('fullName')
+                                                    .hasError('required')
+                                            "
+                                        >
+                                            Doctor Name is required!</mat-error
+                                        >
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="
+                                        flex flex-col
+                                        w-full
+                                        lg:w-1/4
+                                        md:w-1/4
+                                        sm:w-1/4
+                                        lg:pl-2
+                                        md:pl-2
+                                        sm:pl-2
+                                        lg:pr-2
+                                        md:pr-2
+                                        sm:pr-2
+                                    "
+                                >
+                                    <mat-form-field
+                                        [floatLabel]="'always'"
+                                        class="w-full"
+                                    >
+                                        <mat-label>Email</mat-label>
+                                        <input
+                                            type="email"
+                                            matInput
+                                            placeholder="Email"
+                                            [formControlName]="'email'"
+                                        />
+                                        <mat-error
+                                            *ngIf="
+                                                doctorFormGroup
+                                                    .get('email')
+                                                    .hasError('required')
+                                            "
+                                        >
+                                            Email is required!
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="
+                                        flex flex-col
+                                        w-full
+                                        lg:w-1/4
+                                        md:w-1/4
+                                        sm:w-1/4
+                                        lg:pl-2
+                                        md:pl-2
+                                        sm:pl-2
+                                    "
+                                >
+                                    <mat-form-field
+                                        [floatLabel]="'always'"
+                                        class="w-full"
+                                    >
+                                        <mat-label>Contact Number</mat-label>
+                                        <input
+                                            matInput
+                                            type="number"
+                                            placeholder="Contact Number"
+                                            [formControlName]="'contact_number'"
+                                        />
+                                        <mat-error
+                                            *ngIf="
+                                                doctorFormGroup
+                                                    .get('contact_number')
+                                                    .hasError('maxLength')
+                                            "
+                                        >
+                                            Max length exceeded!
+                                        </mat-error>
+                                        <mat-error
+                                            *ngIf="
+                                                doctorFormGroup
+                                                    .get('contact_number')
+                                                    .hasError('required')
+                                            "
+                                        >
+                                            Contact Number is required!
+                                        </mat-error>
+                                    </mat-form-field>
+                                </div>
+                            </div>
+                            <div class="flex flex-auto flex-wrap ml-8 mr-8">
+                                <div
+                                    class="
+                                        flex flex-col
+                                        w-full
+                                        lg:w-1/3
+                                        md:w-1/3
+                                        sm:w-1/3
+                                        lg:pr-2
+                                        md:pr-2
+                                        sm:pr-2
+                                    "
+                                >
+                                    <mat-form-field
+                                        [floatLabel]="'always'"
+                                        class="flex-auto"
+                                    >
+                                        <mat-label>Description</mat-label>
+                                        <textarea
+                                            matInput
+                                            placeholder="Description"
+                                            [formControlName]="'description'"
+                                        ></textarea>
+                                    </mat-form-field>
+                                </div>
+                                <div
+                                    class="
+                                        flex flex-col
+                                        w-full
+                                        lg:w-1/3
+                                        md:w-1/3
+                                        sm:w-1/3
+                                        lg:pl-2
+                                        md:pl-2
+                                        sm:pl-2
+                                        lg:pr-2
+                                        md:pr-2
+                                        sm:pr-2
+                                    "
+                                >
+                                    <mat-label>Gender </mat-label>
+                                    <mat-radio-group
+                                        aria-label="Select an option"
+                                        [formControlName]="'gender'"
+                                        class="p-4"
+                                    >
+                                        <mat-radio-button
+                                            class="mb-2"
+                                            [value]="'male'"
+                                        >
+                                            Male
+                                        </mat-radio-button>
+                                        <mat-radio-button
+                                            class="mb-2 ml-2"
+                                            [value]="'female'"
+                                        >
+                                            Female
+                                        </mat-radio-button>
+                                    </mat-radio-group>
+                                </div>
+                            </div>
+
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-between
+                                    w-full
+                                    border-t
+                                    px-8
+                                    py-4
+                                "
+                            >
+                                <button
+                                    class=""
+                                    mat-flat-button
+                                    [color]="'primary'"
+                                    (click)="addUpdateSelectedDoctor()"
+                                >
+                                    {{
+                                        displayAddDoctorForm ? "Save" : "Update"
+                                    }}
+                                </button>
+                                <div class="flex items-center">
+                                    <button
+                                        class="ml-4"
+                                        mat-flat-button
+                                        [color]="'warn'"
+                                        (click)="deleteSelectedDoctor()"
+                                    >
+                                        {{
+                                            displayAddDoctorForm
+                                                ? "Cancel"
+                                                : "Delete"
+                                        }}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #noDoctor>
+                <div
+                    class="
+                        flex flex-auto flex-col
+                        items-center
+                        justify-center
+                        dark:bg-transparent
+                    "
+                >
+                    <mat-icon
+                        class="icon-size-20"
+                        [svgIcon]="'iconsmind:doctor'"
+                    ></mat-icon>
+                    <div
+                        class="
+                            mt-6
+                            text-2xl
+                            font-semibold
+                            tracking-tight
+                            text-secondary
+                        "
+                    >
+                        There are no doctor available!
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>

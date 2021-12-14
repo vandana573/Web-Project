@@ -1,0 +1,143 @@
+[{
+  "_id": {
+    "$oid": "6193782c0f900ef6db0cb08f"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. Marya",
+  "email": "marya@gmail.com",
+  "contact_number": 9879830891,
+  "description": "Description",
+  "gender": "female",
+  "created_date": {
+    "$date": "2021-11-16T09:21:48.588Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "61937d096ba5e7c5b3fa5860"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. J. Doe",
+  "email": "deo@gmail.com",
+  "contact_number": 9548436215,
+  "description": null,
+  "gender": "male",
+  "created_date": {
+    "$date": "2021-11-16T09:42:33.504Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "61937dc7fda8245cc2539e43"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. Fillmore",
+  "email": "fillmore@gmail.com",
+  "contact_number": 75818574814,
+  "description": "Gynecologist",
+  "gender": "male",
+  "created_date": {
+    "$date": "2021-11-16T09:45:43.193Z"
+  },
+  "__v": 0,
+  "profileImgUrl": "LzYlWl4-clL3mOitl0SRZKEB.jpg"
+},{
+  "_id": {
+    "$oid": "61937df4fda8245cc2539e49"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr Wack",
+  "email": "wack@gmail.com",
+  "contact_number": 6546525588,
+  "description": "Paediatrician",
+  "gender": "female",
+  "created_date": {
+    "$date": "2021-11-16T09:46:28.041Z"
+  },
+  "__v": 0,
+  "profileImgUrl": "-Hhi3Mzm3mqNolwWz-SJ4eja.jpg"
+},{
+  "_id": {
+    "$oid": "61937e30fda8245cc2539e50"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. Rash",
+  "email": "rash@gmail.com",
+  "contact_number": 9875247476,
+  "description": "Psychiatrists",
+  "gender": "female",
+  "created_date": {
+    "$date": "2021-11-16T09:47:28.901Z"
+  },
+  "__v": 0,
+  "profileImgUrl": "lvus9rxtYeU0QEWKKK5BoQ0S.jpg"
+},{
+  "_id": {
+    "$oid": "61937e57fda8245cc2539e56"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. Heine",
+  "email": "heine@gmail.com",
+  "contact_number": 7568544255,
+  "description": "Radiologist",
+  "gender": "female",
+  "created_date": {
+    "$date": "2021-11-16T09:48:07.927Z"
+  },
+  "__v": 0,
+  "profileImgUrl": "dDdUBRtXVrYit2wDPFDKATHQ.jpg"
+},{
+  "_id": {
+    "$oid": "619385adf0f8345bdc6e45bf"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. Grab",
+  "email": "grab@gmail.com",
+  "contact_number": 9845784554,
+  "description": null,
+  "gender": "male",
+  "created_date": {
+    "$date": "2021-11-16T10:19:25.769Z"
+  },
+  "__v": 0,
+  "profileImgUrl": "eerplP_VaHSWrUHWtmFle1sn.jpg"
+},{
+  "_id": {
+    "$oid": "61974df20a69f49ca4fa1828"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. Maullie",
+  "email": "maullie@gmail.com",
+  "contact_number": 8478562145,
+  "profileImgUrl": "cyq3zFkwDY_52658n5S7Bxu3.jpg",
+  "description": null,
+  "gender": "male",
+  "created_date": {
+    "$date": "2021-11-19T07:10:42.821Z"
+  },
+  "__v": 0
+},{
+  "_id": {
+    "$oid": "619752b80a69f49ca4fa18a7"
+  },
+  "status": 1,
+  "present": true,
+  "fullName": "Dr. Radhe",
+  "email": "radhe@gmail.com",
+  "contact_number": 76745343433,
+  "profileImgUrl": "VACBhTswx6doWP-4lIbt-G2z.jpg",
+  "description": "Nothing",
+  "gender": "female",
+  "created_date": {
+    "$date": "2021-11-19T07:31:04.731Z"
+  },
+  "__v": 0
+}]

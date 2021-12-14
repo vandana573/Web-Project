@@ -1,0 +1,37 @@
+layout {
+    display: flex;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+
+    /* Base styles for individual layouts */
+    > * {
+        position: relative;
+        display: flex;
+        flex: 1 1 auto;
+        width: 100%;
+    }
+
+    /* Base styles for components that load as a route */
+    router-outlet {
+        + * {
+            position: relative;
+            display: flex;
+            flex: 1 1 auto;
+            width: 100%;
+        }
+    }
+
+    .mat-form-field-subscript-wrapper{
+        line-height: 2 !important;
+    }
+}
+
+
+fuse-alert.fuse-alert-appearance-outline {
+    width: auto;
+    left: 50%;
+    z-index: 9999;
+    position: absolute;
+}

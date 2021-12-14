@@ -1,0 +1,544 @@
+<!-- dashboard content -->
+<div
+    class="
+        sm:absolute sm:inset-0
+        flex flex-col flex-auto
+        min-w-0
+        sm:overflow-hidden
+        bg-card
+        dark:bg-transparent
+    "
+>
+    <div class="bg-accent-200 flex flex-auto overflow-auto">
+        <div class="flex flex-col flex-auto">
+            <ng-container *ngIf="this.userD.role === 'admin'">
+                <div
+                    class="
+                        grid grid-cols-1
+                        sm:grid-cols-2
+                        md:grid-cols-4
+                        gap-6
+                        w-full
+                        min-w-0
+                        p-4
+                    "
+                >
+                    <!-- Appointment -->
+                    <div
+                        class="
+                            flex flex-col flex-auto
+                            p-6
+                            bg-card
+                            shadow
+                            rounded-2xl
+                            overflow-hidden
+                        "
+                        [routerLink]="['../', 'appointments', 'all']"
+                    >
+                        <div class="flex flex-col items-center mt-2">
+                            <div
+                                class="
+                                    text-7xl
+                                    sm:text-8xl
+                                    font-bold
+                                    tracking-tight
+                                    leading-none
+                                    text-green-500
+                                "
+                            >
+                                {{ dAppointmentLength || 0 }}
+                            </div>
+                            <div
+                                class="
+                                    text-lg
+                                    font-medium
+                                    text-green-600
+                                    dark:text-green-500
+                                "
+                            >
+                                Appointments
+                            </div>
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    w-full
+                                    mt-5
+                                    text-secondary
+                                "
+                            ></div>
+                        </div>
+                    </div>
+                    <!-- Lab Reports -->
+                    <div
+                        class="
+                            flex flex-col flex-auto
+                            p-6
+                            bg-card
+                            shadow
+                            rounded-2xl
+                            overflow-hidden
+                        "
+                        (click)="openLabReportDialog(labReportTemplate)"
+                    >
+                        <div class="flex items-start justify-between"></div>
+                        <div class="flex flex-col items-center mt-2">
+                            <div
+                                class="
+                                    text-7xl
+                                    sm:text-8xl
+                                    font-bold
+                                    tracking-tight
+                                    leading-none
+                                    text-amber-500
+                                "
+                            >
+                                +
+                            </div>
+                            <div
+                                class="
+                                    text-lg
+                                    font-medium
+                                    text-amber-600
+                                    dark:text-amber-500
+                                "
+                            >
+                                Lab Reports
+                            </div>
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    w-full
+                                    mt-5
+                                    text-secondary
+                                "
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+            </ng-container>
+            <ng-container *ngIf="this.userD.role === 'patient'">
+                <div
+                    class="
+                        grid grid-cols-1
+                        sm:grid-cols-2
+                        md:grid-cols-4
+                        gap-6
+                        w-full
+                        min-w-0
+                        p-4
+                    "
+                >
+                    <!-- Appointment -->
+                    <div
+                        class="
+                            flex flex-col flex-auto
+                            p-6
+                            bg-card
+                            shadow
+                            rounded-2xl
+                            overflow-hidden
+                        "
+                        [routerLink]="['../', 'patient-appointment']"
+                    >
+                        <div class="flex flex-col items-center mt-2">
+                            <div
+                                class="
+                                    text-7xl
+                                    sm:text-8xl
+                                    font-bold
+                                    tracking-tight
+                                    leading-none
+                                    text-green-500
+                                "
+                            >
+                                {{ pAppointmentLength || 0 }}
+                            </div>
+                            <div
+                                class="
+                                    text-lg
+                                    font-medium
+                                    text-green-600
+                                    dark:text-green-500
+                                "
+                            >
+                                Appointments
+                            </div>
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    w-full
+                                    mt-5
+                                    text-secondary
+                                "
+                            ></div>
+                        </div>
+                    </div>
+                    <!-- Lab Reports -->
+                    <div
+                        class="
+                            flex flex-col flex-auto
+                            p-6
+                            bg-card
+                            shadow
+                            rounded-2xl
+                            overflow-hidden
+                        "
+                        (click)="onViewReportClick()"
+                    >
+                        <div class="flex items-start justify-between"></div>
+                        <div class="flex flex-col items-center mt-2">
+                            <div
+                                class="
+                                    text-7xl
+                                    sm:text-8xl
+                                    font-bold
+                                    tracking-tight
+                                    leading-none
+                                    text-pink-500
+                                "
+                            >
+                                <mat-icon
+                                    class="icon-size-10 text-pink-400"
+                                    svgIcon="mat_outline:streetview"
+                                >
+                                </mat-icon>
+                            </div>
+                            <div
+                                class="
+                                    text-lg
+                                    font-medium
+                                    text-pink-600
+                                    dark:text-pink-500
+                                "
+                            >
+                                Lab Reports
+                            </div>
+                            <div
+                                class="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    w-full
+                                    mt-5
+                                    text-secondary
+                                "
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Dialog for view report -->
+                <div
+                    class="
+                        fixed
+                        inset-0
+                        bg-gray-600 bg-opacity-50
+                        overflow-y-auto
+                        h-full
+                        w-full
+                        font-semibold
+                    "
+                    id="my-modal"
+                    *ngIf="openRport === true"
+                >
+                    <div
+                        class="
+                            relative
+                            top-20
+                            mx-auto
+                            p-5
+                            border
+                            w-1/3
+                            shadow-lg
+                            rounded-md
+                            bg-white
+                        "
+                    >
+                        <div
+                            class="flex justify-end"
+                            style="cursor: pointer"
+                            (click)="closeReport()"
+                        >
+                            <mat-icon svgIcon="heroicons_solid:x"></mat-icon>
+                        </div>
+                        <form [formGroup]="reportForm">
+                            <mat-form-field
+                                [floatLabel]="'always'"
+                                class="flex flex-col"
+                            >
+                                <mat-label>Doctor</mat-label>
+                                <mat-select
+                                    [formControlName]="'doctor'"
+                                    placeholder="Select doctor"
+                                >
+                                    <mat-option
+                                        *ngFor="let doctor of doctorName"
+                                        [value]="doctor"
+                                    >
+                                        {{ getDoctors(doctor)?.fullName }}
+                                    </mat-option>
+                                </mat-select>
+                                <mat-error
+                                    *ngIf="
+                                        reportForm
+                                            .get('doctor')
+                                            .hasError('required')
+                                    "
+                                    >Dactor is required.
+                                </mat-error>
+                            </mat-form-field>
+
+                            <div class="flex justify-end fong-semibold">
+                                <button
+                                    class="bg-blue-400 p-2 m-1 rounded-md"
+                                    type="button"
+                                    (click)="viewEvents()"
+                                >
+                                    View
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="flex flex-auto overflow-auto" *ngIf="showGrid">
+                    <div
+                        class="
+                            flex flex-col flex-auto
+                            overflow-hidden
+                            sm:overflow-y-auto
+                        "
+                        style="max-height: 460px"
+                    >
+                        <ng-container
+                            *ngIf="events.length > 0; else noAppointment"
+                        >
+                            <div class="grid">
+                                <!-- Header -->
+                                <div
+                                    class="
+                                        appointment-grid
+                                        z-10
+                                        sticky
+                                        top-0
+                                        grid
+                                        gap-4
+                                        py-4
+                                        px-6
+                                        md:px-8
+                                        shadow
+                                        text-md
+                                        font-semibold
+                                        text-secondary
+                                        bg-gray-50
+                                        dark:bg-black dark:bg-opacity-5
+                                    "
+                                >
+                                    <div>#Number</div>
+                                    <div>Date</div>
+                                    <div></div>
+                                    <div>Doctor Name</div>
+                                    <div>Time Slot</div>
+                                    <div>Details</div>
+                                </div>
+                                <!-- Rows -->
+                                <ng-container
+                                    *ngFor="
+                                        let type of events;
+                                        trackBy: trackByFn;
+                                        let i = index
+                                    "
+                                >
+                                    <div
+                                        class="
+                                            appointment-grid
+                                            grid
+                                            items-center
+                                            gap-4
+                                            py-3
+                                            px-6
+                                            md:px-8
+                                            border-b
+                                        "
+                                    >
+                                        <!-- Name -->
+                                        <div class="truncate">
+                                            {{ type.apptNumber }}
+                                        </div>
+                                        <div class="truncate">
+                                            {{ type.date | date: "MMM d, y" }}
+                                        </div>
+                                        <div class="truncate">
+                                            <img
+                                                class="
+                                                    w-10
+                                                    h-10
+                                                    rounded-full
+                                                    mt-0
+                                                "
+                                                [src]="
+                                                    imgPath +
+                                                    'doctors/' +
+                                                    getDoctors(type.doctor_id)
+                                                        ?.profileImgUrl
+                                                "
+                                                *ngIf="
+                                                    getDoctors(type.doctor_id)
+                                                        ?.profileImgUrl
+                                                "
+                                                onerror="this.src='../../assets/images/no-image-icon.png';
+                                                        type=''"
+                                            />
+                                        </div>
+                                        <div class="truncate">
+                                            {{
+                                                getDoctors(type.doctor_id)
+                                                    ?.fullName
+                                            }}
+                                        </div>
+                                        <div class="truncate">
+                                            {{ type.time_slot }}
+                                        </div>
+                                        <div class="flex items-center">
+                                            <ng-container
+                                                *ngIf="type.reports.length > 0"
+                                            >
+                                                <ng-container
+                                                    *ngFor="
+                                                        let data of type.reports
+                                                    "
+                                                >
+                                                    <button
+                                                        class="m-0.5"
+                                                        (click)="
+                                                            downloadReport(
+                                                                data.report_name,
+                                                                data.report_file
+                                                            )
+                                                        "
+                                                    >
+                                                        <mat-icon
+                                                            class="
+                                                                icon-size-6
+                                                                text-green-600
+                                                            "
+                                                            svgIcon="heroicons_outline:download"
+                                                            [matTooltip]="
+                                                                data.report_name
+                                                            "
+                                                        >
+                                                        </mat-icon>
+                                                    </button>
+                                                </ng-container>
+                                            </ng-container>
+                                            <ng-container
+                                                *ngIf="
+                                                    type.reports.length === 0
+                                                "
+                                            >
+                                                <mat-icon
+                                                    class="
+                                                        text-red-400
+                                                        icon-size-5
+                                                    "
+                                                    matTooltip="No report uploaded!"
+                                                    [svgIcon]="
+                                                        'heroicons_solid:x'
+                                                    "
+                                                >
+                                                </mat-icon>
+                                            </ng-container>
+                                        </div>
+                                    </div>
+                                </ng-container>
+                            </div>
+                        </ng-container>
+                        <ng-template #noAppointment>
+                            <div
+                                class="
+                                    flex flex-auto flex-col
+                                    items-center
+                                    justify-center
+                                    bg-gray-100
+                                    dark:bg-transparent
+                                "
+                            >
+                                <mat-icon
+                                    class="icon-size-20"
+                                    [svgIcon]="'iconsmind:file_search'"
+                                ></mat-icon>
+                                <div
+                                    class="
+                                        mt-6
+                                        text-2xl
+                                        font-semibold
+                                        tracking-tight
+                                        text-secondary
+                                    "
+                                >
+                                    No appointments found!
+                                </div>
+                            </div>
+                        </ng-template>
+                    </div>
+                </div>
+            </ng-container>
+        </div>
+        <ng-template #labReportTemplate>
+            <form
+                class="flex flex-col"
+                [formGroup]="assignPatientForm"
+                style="width: 350px"
+            >
+                <div class="text-2xl font-semibold tracking-tight">
+                    Lab Report
+                </div>
+
+                <div class="flex flex-col mt-12">
+                    <div class="flex items-center">
+                        <mat-form-field
+                            class="fuse-mat-no-subscript w-full -mt-6"
+                            [floatLabel]="'always'"
+                        >
+                            <mat-label>Select Patient</mat-label>
+                            <mat-select
+                                [formControlName]="'patient'"
+                                placeholder="Select Patient"
+                            >
+                                <ng-container *ngFor="let data of patients">
+                                    <mat-option [value]="data">
+                                        {{ data }}
+                                    </mat-option>
+                                </ng-container>
+                            </mat-select>
+                            <mat-icon
+                                class="icon-size-5"
+                                matPrefix
+                                [svgIcon]="'heroicons_solid:user-add'"
+                            ></mat-icon>
+                        </mat-form-field>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="ml-auto mt-8">
+                    <!-- <button class="clear" mat-button [color]="'primary'" (click)="clear()">
+            Clear
+        </button> -->
+                    <button
+                        mat-flat-button
+                        [disabled]="assignPatientForm.invalid"
+                        [color]="'primary'"
+                        (click)="done()"
+                    >
+                        Done
+                    </button>
+                </div>
+            </form>
+        </ng-template>
+    </div>
+</div>

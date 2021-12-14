@@ -1,0 +1,512 @@
+rss[i] <- sum(fit$residuals ^ 2)
+}
+plot(1:10, rss, type = 'l', xlab = "Degree", ylab = "RSS", col = 'navyblue')
+library(leaps)
+library(boot)
+library(glmnet)
+testMSE <- rep(NA, 10)
+for (i in 1:10) {
+fit = glm(nox ~ poly(dis, i), data = Boston)
+testMSE[i] = cv.glm(Boston, fit, K = 10)$delta[1]
+}
+plot(1:10, testMSE, type = 'l', xlab = "Degree", ylab = "Test MSE")
+points(which.min(testMSE), testMSE[which.min(testMSE)], col = 'navyblue', pch = 18)
+library(leaps)
+library(MASS)
+library(splines)
+dof <- 8
+fit <- lm(nox ~ bs(dis, df = dof), data = Boston)
+attr(bs(Boston$dis, df = dof), "knots")
+preds <- predict(fit, list(dis = dis.grid), se = TRUE)
+se.bands <- cbind(preds$fit + 2* preds$se.fit, preds$fit - 2 * preds$se.fit)
+plot(nox ~ dis, data = Boston, col = "purple")
+lines(dis.grid, preds$fit, lwd = 2, col = "red")
+matlines(dis.grid, se.bands, lwd = 1, col = "brown", lty = 3)
+library(leaps)
+library(MASS)
+res = c()
+df.range = 3:16
+for (dof in df.range) {
+fit = lm(nox ~ bs(dis, df = dof), data = Boston)
+res = c(res, sum(fit$residuals ^ 2))
+}
+plot(df.range, res, type = 'l', xlab = 'degree of freedom', ylab = 'RSS', col = "orange")
+library(leaps)
+library(boot)
+library(glmnet)
+res <- c()
+for (dof in df.range) {
+fit <- glm(nox ~ bs(dis, df = dof), data = Boston)
+testMSE <- cv.glm(Boston, fit, K = 10)$delta[1]
+res <- c(res, testMSE)
+}
+plot(df.range, res, type = 'l', xlab = 'degree of freedom', ylab = 'Test MSE')
+points(which.min(res) + 2, res[which.min(res)], col = 'brown', pch = 10)
+library(leaps)
+library(boot)
+library(glmnet)
+res <- c()
+for (dof in df.range) {
+fit <- glm(nox ~ bs(dis, df = dof), data = Boston)
+testMSE <- cv.glm(Boston, fit, K = 10)$delta[1]
+res <- c(res, testMSE)
+}
+plot(df.range, res, type = 'l', xlab = 'degree of freedom', ylab = 'Test MSE')
+points(which.min(res) + 2, res[which.min(res)], col = 'brown', pch = 10)
+# 8 (a)
+library(ISLR)
+set.seed(1)
+train <- sample(1:nrow(Carseats), nrow(Carseats) / 2)
+Carseats.train <- Carseats[train, ]
+Carseats.test <- Carseats[-train, ]
+library(tree)
+tree.carseats <- tree(Sales ~ ., data = Carseats.train)
+summary(tree.carseats)
+plot(tree.carseats)
+text(tree.carseats, pretty = 0)
+yhat <- predict(tree.carseats, newdata = Carseats.test)
+mean((yhat - Carseats.test$Sales)^2)
+install.packages('randomForest')
+library(randomForest)
+cv.carseats <- cv.tree(tree.carseats)
+plot(cv.carseats$size, cv.carseats$dev, type = "b")
+tree.min <- which.min(cv.carseats$dev)
+points(tree.min, cv.carseats$dev[tree.min], col = "red", cex = 2, pch = 20)
+prune.carseats <- prune.tree(tree.carseats, best = 8)
+plot(prune.carseats)
+text(prune.carseats, pretty = 0)
+yhat <- predict(prune.carseats, newdata = Carseats.test)
+mean((yhat - Carseats.test$Sales)^2)
+# (d)
+bag.carseats <- randomForest(Sales ~ ., data = Carseats.train, mtry = 10, ntree = 500, importance = TRUE)
+yhat.bag <- predict(bag.carseats, newdata = Carseats.test)
+mean((yhat.bag - Carseats.test$Sales)^2)
+importance(bag.carseats)
+# (d)
+bag.carseats <- randomForest(Sales ~ ., data = Carseats.train, mtry = 10, ntree = 500, importance = TRUE)
+yhat.bag <- predict(bag.carseats, newdata = Carseats.test)
+mean((yhat.bag - Carseats.test$Sales)^2)
+importance(bag.carseats)
+# (e)
+rf.carseats <- randomForest(Sales ~ ., data = Carseats.train, mtry = 3, ntree = 500, importance = TRUE)
+yhat.rf <- predict(rf.carseats, newdata = Carseats.test)
+mean((yhat.rf - Carseats.test$Sales)^2)
+importance(rf.carseats)
+# 10 (a)
+Hitters <- na.omit(Hitters)
+Hitters$Salary <- log(Hitters$Salary)
+# (b)
+train <- 1:200
+Hitters.train <- Hitters[train, ]
+Hitters.test <- Hitters[-train, ]
+library(gbm)
+set.seed(1)
+pows <- seq(-10, -0.2, by = 0.1)
+lambdas <- 10^pows
+train.err <- rep(NA, length(lambdas))
+for (i in 1:length(lambdas)) {
+boost.hitters <- gbm(Salary ~ ., data = Hitters.train, distribution = "gaussian", n.trees = 1000, shrinkage = lambdas[i])
+pred.train <- predict(boost.hitters, Hitters.train, n.trees = 1000)
+train.err[i] <- mean((pred.train - Hitters.train$Salary)^2)
+}
+plot(lambdas, train.err, type = "b", xlab = "Shrinkage values", ylab = "Training MSE")
+# (d)
+set.seed(1)
+test.err <- rep(NA, length(lambdas))
+for (i in 1:length(lambdas)) {
+boost.hitters <- gbm(Salary ~ ., data = Hitters.train, distribution = "gaussian", n.trees = 1000, shrinkage = lambdas[i])
+yhat <- predict(boost.hitters, Hitters.test, n.trees = 1000)
+test.err[i] <- mean((yhat - Hitters.test$Salary)^2)
+}
+plot(lambdas, test.err, type = "b", xlab = "Shrinkage values", ylab = "Test MSE")
+min(test.err)
+lambdas[which.min(test.err)]
+# (e)
+library(glmnet)
+fit1 <- lm(Salary ~ ., data = Hitters.train)
+pred1 <- predict(fit1, Hitters.test)
+mean((pred1 - Hitters.test$Salary)^2)
+x <- model.matrix(Salary ~ ., data = Hitters.train)
+x.test <- model.matrix(Salary ~ ., data = Hitters.test)
+y <- Hitters.train$Salary
+fit2 <- glmnet(x, y, alpha = 0)
+pred2 <- predict(fit2, s = 0.01, newx = x.test)
+mean((pred2 - Hitters.test$Salary)^2)
+library(glmnet)
+fit1 <- lm(Salary ~ ., data = Hitters.train)
+pred1 <- predict(fit1, Hitters.test)
+mean((pred1 - Hitters.test$Salary)^2)
+x <- model.matrix(Salary ~ ., data = Hitters.train)
+x.test <- model.matrix(Salary ~ ., data = Hitters.test)
+y <- Hitters.train$Salary
+fit2 <- glmnet(x, y, alpha = 0)
+pred2 <- predict(fit2, s = 0.01, newx = x.test)
+mean((pred2 - Hitters.test$Salary)^2)
+# (f)
+library(gbm)
+boost.hitters <- gbm(Salary ~ ., data = Hitters.train, distribution = "gaussian", n.trees = 1000, shrinkage = lambdas[which.min(test.err)])
+summary(boost.hitters)
+set.seed(1)
+bag.hitters <- randomForest(Salary ~ ., data = Hitters.train, mtry = 19, ntree = 500)
+yhat.bag <- predict(bag.hitters, newdata = Hitters.test)
+mean((yhat.bag - Hitters.test$Salary)^2)
+set.seed(1)
+bag.hitters <- randomForest(Salary ~ ., data = Hitters.train, mtry = 19, ntree = 500)
+yhat.bag <- predict(bag.hitters, newdata = Hitters.test)
+mean((yhat.bag - Hitters.test$Salary)^2)
+set.seed(1)
+x1 <- runif(500) - 0.5
+x2 <- runif(500) - 0.5
+y <- 1 * (x1^2 - x2^2 > 0)
+plot(x1, x2, xlab = "X1", ylab = "X2", col = (4 - y), pch = (3 - y))
+logit.fit <- glm(y ~ x1 + x2, family = "binomial")
+summary(logit.fit)
+logit.fit <- glm(y ~ x1 + x2, family = "binomial")
+summary(logit.fit)
+data <- data.frame(x1 = x1, x2 = x2, y = y)
+probs <- predict(logit.fit, data, type = "response")
+preds <- rep(0, 500)
+preds[probs > 0.47] <- 1
+plot(data[preds == 1, ]$x1, data[preds == 1, ]$x2, col = (4 - 1), pch = (3 - 1), xlab = "X1", ylab = "X2")
+points(data[preds == 0, ]$x1, data[preds == 0, ]$x2, col = (4 - 0), pch = (3 - 0))
+logitnl.fit <- glm(y ~ poly(x1, 2) + poly(x2, 2) + I(x1 * x2), family = "binomial")
+summary(logitnl.fit)
+logitnl.fit <- glm(y ~ poly(x1, 2) + poly(x2, 2) + I(x1 * x2), family = "binomial")
+summary(logitnl.fit)
+probs <- predict(logitnl.fit, data, type = "response")
+preds <- rep(0, 500)
+preds[probs > 0.47] <- 1
+plot(data[preds == 1, ]$x1, data[preds == 1, ]$x2, col = (4 - 1), pch = (3 - 1), xlab = "X1", ylab = "X2")
+points(data[preds == 0, ]$x1, data[preds == 0, ]$x2, col = (4 - 0), pch = (3 - 0))
+library("e1071")
+data$y <- as.factor(data$y)
+svm.fit <- svm(y ~ x1 + x2, data, kernel = "linear", cost = 0.01)
+preds <- predict(svm.fit, data)
+plot(data[preds == 0, ]$x1, data[preds == 0, ]$x2, col = (4 - 0), pch = (3 - 0), xlab = "X1", ylab = "X2")
+points(data[preds == 1, ]$x1, data[preds == 1, ]$x2, col = (4 - 1), pch = (3 - 1))
+data$y <- as.factor(data$y)
+svmnl.fit <- svm(y ~ x1 + x2, data, kernel = "radial", gamma = 1)
+preds <- predict(svmnl.fit, data)
+plot(data[preds == 0, ]$x1, data[preds == 0, ]$x2, col = (4 - 0), pch = (3 - 0), xlab = "X1", ylab = "X2")
+points(data[preds == 1, ]$x1, data[preds == 1, ]$x2, col = (4 - 1), pch = (3 - 1))
+# 6 (a)
+set.seed(1)
+x.one <- runif(500, 0, 90)
+y.one <- runif(500, x.one + 10, 100)
+x.one.noise <- runif(50, 20, 80)
+y.one.noise <- 5/4 * (x.one.noise - 10) + 0.1
+x.zero <- runif(500, 10, 100)
+y.zero <- runif(500, 0, x.zero - 10)
+x.zero.noise <- runif(50, 20, 80)
+y.zero.noise <- 5/4 * (x.zero.noise - 10) - 0.1
+class.one <- seq(1, 550)
+x <- c(x.one, x.one.noise, x.zero, x.zero.noise)
+y <- c(y.one, y.one.noise, y.zero, y.zero.noise)
+plot(x[class.one], y[class.one], col = "blue", pch = "+", ylim = c(0, 100))
+points(x[-class.one], y[-class.one], col = "red", pch = 4)
+# (b)
+set.seed(2)
+z <- rep(0, 1100)
+z[class.one] <- 1
+data <- data.frame(x = x, y = y, z = as.factor(z))
+tune.out <- tune(svm, z ~ ., data = data, kernel = "linear", ranges = list(cost = c(0.01, 0.1, 1, 5, 10, 100, 1000, 10000)))
+summary(tune.out)
+data.frame(cost = tune.out$performance$cost, misclass = tune.out$performance$error * 1100)
+# (c)
+x.test <- runif(1000, 0, 100)
+class.one <- sample(1000, 500)
+y.test <- rep(NA, 1000)
+# Set y > x for class.one
+for (i in class.one) {
+y.test[i] <- runif(1, x.test[i], 100)
+}
+# set y < x for class.zero
+for (i in setdiff(1:1000, class.one)) {
+y.test[i] <- runif(1, 0, x.test[i])
+}
+plot(x.test[class.one], y.test[class.one], col = "blue", pch = "+")
+points(x.test[-class.one], y.test[-class.one], col = "red", pch = 4)
+set.seed(3)
+z.test <- rep(0, 1000)
+z.test[class.one] <- 1
+data.test <- data.frame(x = x.test, y = y.test, z = as.factor(z.test))
+costs <- c(0.01, 0.1, 1, 5, 10, 100, 1000, 10000)
+test.err <- rep(NA, length(costs))
+for (i in 1:length(costs)) {
+svm.fit <- svm(z ~ ., data = data, kernel = "linear", cost = costs[i])
+pred <- predict(svm.fit, data.test)
+test.err[i] <- sum(pred != data.test$z)
+}
+data.frame(cost = costs, misclass = test.err)
+n=20
+p <- c(2,4,6,8,10)
+RSS <- c(220,200,190,187,186,5)
+AIC = rep(0,5)
+BIC = rep(0,5)
+degree=0:5
+for(d in degree){
+AIC[d]= n * log(RSS[d]/n) + 2 *(p[d]+1)
+BIC[d]= n * log(RSS[d]/n) + log(n)*(p[d] + 1)
+}
+AIC
+BIC
+x = -2:2
+y = 1 + x + -2 * (x-1)^2 * I(x>1)
+plot(x,y)
+x = -2:2
+y = c(1 + 0 + 0,
+1 + 0 + 0,
+1 + 1 + 0,
+1 + (1-0) + 0,
+1 + (1-1) + 0,
+)
+x = -2:2
+y = c(1 + 0 + 0,
+1 + 0 + 0,
+1 + 1 + 0,
+1 + (1-0) + 0,
+1 + (1-1) + 0
+)
+plot(x,y)
+x = -2:2
+y = c(1 + 0 + 0,
+1 + 0 + 0,
+1 + 1 + 0,
+1 + (1-0) + 0,
+1 + (1-1) + 0
+)
+plot(x,y)
+p <- seq(0, 1, 0.01)
+gini.index <- 2 * p * (1 - p)
+class.error <- 1 - pmax(p, 1 - p)
+cross.entropy <- - (p * log(p) + (1 - p) * log(1 - p))
+matplot(p, cbind(gini.index, class.error, cross.entropy), col = c("red", "green", "blue"))
+library(MASS)
+library(ISLR)
+library(class)
+library(tidyverse)
+require(ISLR)
+require(tree)
+Age <- c(12,13,14,16,20,24,32,45,65,73,75)
+A <- c("N","N","N","Y","N","Y","N","Y","Y","Y","Y")
+B <- c("Y","Y","Y","N","Y","N","N","N","Y","N","N")
+Product = data.frame(Age, A= as.factor(A),B= as.factor(B))
+attach(Product)
+dim(Product)
+head(Product)
+tree.Product = tree(Age~A,data=Product)
+tree.Product
+summary(tree.Product)
+plot(tree.Product)
+text(tree.Product,pretty = 0)
+tree.Product = tree(Age~B,data=Product)
+tree.Product
+tree.Product = tree(Age~B,data=Product)
+tree.Product
+summary(tree.Product)
+plot(tree.Product)
+text(tree.Product,pretty = 0)
+tree.Product = tree(Age~.,data=Product)
+tree.Product
+summary(tree.Product)
+plot(tree.Product)
+text(tree.Product,pretty = 0)
+tree.Product = tree(Age~.,data=Product, minsize = 1)
+tree.Product
+summary(tree.Product)
+plot(tree.Product)
+text(tree.Product,pretty = 0)
+x1 <- -10:10
+x2 <- 1 + 3 * x1
+plot(x1, x2, type = "l", col = "blue")
+text(c(0), c(-20), "Greater than 0", col = "blue")
+text(c(0), c(20), "Less than 0", col = "blue")
+lines(x1, 1 - x1/2, col = "red")
+text(c(0), c(-15), "Less than 0", col = "red")
+text(c(0), c(15), "Greater than 0", col = "red")
+plot(NA, NA, type = "n", xlim = c(-4, 2), ylim = c(-1, 5), asp = 1, xlab = "X1", ylab = "X2")
+symbols(c(-1), c(2), circles = c(2), add = TRUE, inches = FALSE)
+plot(NA, NA, type = "n", xlim = c(-4, 2), ylim = c(-1, 5), asp = 1, xlab = "X1", ylab = "X2")
+symbols(c(-1), c(2), circles = c(2), add = TRUE, inches = FALSE)
+text(c(-1), c(2), "< 4")
+text(c(-4), c(2), "> 4")
+plot(c(0, -1, 2, 3), c(0, 1, 2, 8), col = c("blue", "red", "blue", "blue"),
+type = "p", asp = 1, xlab = "X1", ylab = "X2")
+symbols(c(-1), c(2), circles = c(2), add = TRUE, inches = FALSE)
+plot(c(0, -1, 2, 3), c(0, 1, 2, 8), col = c("blue", "red", "blue", "blue"),
+type = "p", asp = 1, xlab = "X1", ylab = "X2")
+symbols(c(-1), c(2), circles = c(2), add = TRUE, inches = FALSE)
+x1 = c(3, 2, 4, 1, 2, 4, 4)
+x2 = c(4, 2, 4, 4, 1, 3, 1)
+colors = c("red", "red", "red", "red", "blue", "blue", "blue")
+plot(x1, x2, col = colors, xlim = c(0, 5), ylim = c(0, 5))
+plot(x1, x2, col = colors, xlim = c(0, 5), ylim = c(0, 5))
+abline(-0.5, 1)
+plot(x1, x2, col = colors, xlim = c(0, 5), ylim = c(0, 5))
+abline(-0.5, 1)
+abline(-1, 1, lty = 2)
+abline(0, 1, lty = 2)
+plot(x1, x2, col = colors, xlim = c(0, 5), ylim = c(0, 5))
+abline(-0.3, 1)
+plot(x1, x2, col = colors, xlim = c(0, 5), ylim = c(0, 5))
+points(c(3), c(1), col = c("red"))
+source('C:/Users/mvand/OneDrive/Desktop/ISL/ISL Lab 6 & 7.R')
+x <- cbind(c(1, 1, 0, 5, 6, 4), c(4, 3, 4, 1, 2, 0))
+plot(x[,1], x[,2])
+set.seed(1)
+labels <- sample(2, nrow(x), replace = T)
+labels
+plot(x[, 1], x[, 2], col = (labels + 1), pch = 20, cex = 2)
+centroid1 <- c(mean(x[labels == 1, 1]), mean(x[labels == 1, 2]))
+centroid2 <- c(mean(x[labels == 2, 1]), mean(x[labels == 2, 2]))
+plot(x[,1], x[,2], col=(labels + 1), pch = 20, cex = 2)
+points(centroid1[1], centroid1[2], col = 2, pch = 4)
+points(centroid2[1], centroid2[2], col = 3, pch = 4)
+plot(x[,1], x[,2], col=(labels + 1), pch = 20, cex = 2)
+points(centroid1[1], centroid1[2], col = 2, pch = 4)
+points(centroid2[1], centroid2[2], col = 3, pch = 4)
+labels <- c(1, 1, 1, 2, 2, 2)
+plot(x[, 1], x[, 2], col = (labels + 1), pch = 20, cex = 2)
+points(centroid1[1], centroid1[2], col = 2, pch = 4)
+points(centroid2[1], centroid2[2], col = 3, pch = 4)
+centroid1 <- c(mean(x[labels == 1, 1]), mean(x[labels == 1, 2]))
+centroid2 <- c(mean(x[labels == 2, 1]), mean(x[labels == 2, 2]))
+plot(x[,1], x[,2], col=(labels + 1), pch = 20, cex = 2)
+plot(x[,1], x[,2], col=(labels + 1), pch = 20, cex = 2)
+points(centroid1[1], centroid1[2], col = 2, pch = 4)
+points(centroid2[1], centroid2[2], col = 3, pch = 4)
+plot(x[, 1], x[, 2], col=(labels + 1), pch = 20, cex = 2)
+plot(x[, 1], x[, 2], col=(labels + 1), pch = 20, cex = 2)
+d = as.dist(matrix(c(0, 0.3, 0.4, 0.7,
+0.3, 0, 0.5, 0.8,
+0.4, 0.5, 0.0, 0.45,
+0.7, 0.8, 0.45, 0.0), nrow = 4))
+plot(hclust(d, method = "complete"))
+plot(hclust(d, method = "single"))
+plot(hclust(d, method = "single"))
+plot(hclust(d, method = "complete"), labels = c(2,1,4,3))
+pr.out <- prcomp(USArrests, scale = TRUE)
+pr.var <- pr.out$sdev^2
+pve <- pr.var / sum(pr.var)
+sum(pr.var)
+pve
+loadings <- pr.out$rotation
+USArrests2 <- scale(USArrests)
+sumvar <- sum(apply(as.matrix(USArrests2)^2, 2, sum))
+apply((as.matrix(USArrests2) %*% loadings)^2, 2, sum) / sumvar
+set.seed(2)
+hc.complete <- hclust(dist(USArrests), method = "complete")
+plot(hc.complete)
+cutree(hc.complete, 3)
+sd.data <- scale(USArrests)
+hc.complete.sd <- hclust(dist(sd.data), method = "complete")
+plot(hc.complete.sd)
+cutree(hc.complete.sd, 3)
+table(cutree(hc.complete, 3), cutree(hc.complete.sd, 3))
+library(MASS)
+library(ISLR)
+library(class)
+library(tidyverse)
+library(leaps)
+library(glmnet)
+library(splines)
+attach(Wage)
+require(tree)
+library(randomForest)
+set.seed(19)
+x = rnorm(100)
+error = rnorm(100)
+b0 = 17; b1 =3; b2 = 0.8; b3 = -4
+y = b0 + b1*x + b2*x^2 + b3*x^3 + error
+x.new <- x
+for(i in 2:10){ x.new <- cbind(x.new,x^i)}
+colnames(x.new) <- paste("x", 1:ncol(x.new), sep="")
+mydata <- data.frame(cbind(y, x.new))
+regfit<-regsubsets(y~., data=mydata,nvmax=10)
+regsum<-summary(regfit)
+library(MASS)
+library(ISLR)
+library(class)
+library(tidyverse)
+library(leaps)
+library(glmnet)
+library(splines)
+attach(Wage)
+require(tree)
+library(randomForest)
+set.seed(19)
+x = rnorm(100)
+error = rnorm(100)
+b0 = 17; b1 =3; b2 = 0.8; b3 = -4
+y = b0 + b1*x + b2*x^2 + b3*x^3 + error
+x.new <- x
+for(i in 2:10){ x.new <- cbind(x.new,x^i)}
+colnames(x.new) <- paste("x", 1:ncol(x.new), sep="")
+mydata <- data.frame(cbind(y, x.new))
+regfit<-regsubsets(y~., data=mydata,nvmax=10)
+regsum<-summary(regfit)
+#L1-2
+regsum$cp
+#L1-1
+regfit<-regsubsets(y~., data=mydata,nvmax=10)
+regsum<-summary(regfit)
+#L1-3
+plot(regsum$bic)
+#L1-4
+which.min(regsum$bic)
+#L1-2
+regsum$bic
+#L1-3
+coef(regfit,which.min(regsum$bic))
+#L1-4
+plot(regsum$cp)
+points(which.min(regsum$cp),regsum$cp[which.min(regsum$cp)],col="green")
+#L1-4
+plot(regsum$cp)
+points(which.min(regsum$cp),regsum$cp[which.min(regsum$cp)],col="green")
+#L1-5
+which.min(regsum$cp)
+#L1-6
+which.max(regsum$adjr2)
+y = mtcars$hp
+x = data.matrix(mtcars[, c('mpg', 'wt', 'drat', 'qsec', 'cyl', 'am')])
+#L2-1
+reg_model<-glmnet(x,y,alpha=0,lambda=10)
+#L2-1
+reg_model<-glmnet(x,y,alpha=0,lambda=10)
+y = mtcars$hp
+x = data.matrix(mtcars[, c('mpg', 'wt', 'drat', 'qsec', 'cyl', 'am')])
+#L2-1
+reg_model<-glmnet(x,y,alpha=0,lambda=10)
+#L2-2
+coef(reg_model)
+#L2-3
+cv_model<-cv.glmnet(x,y,alpha=0)
+cv_model
+#L2-4
+best_lambda<-cv_model$lambda.min
+best_lambda
+#L2-5
+best_lambda<-glmnet(x,y,alpha=0,lambda = best_lambda)
+coef(best_model)
+#L2-5
+best_model<-glmnet(x,y,alpha=0,lambda = best_lambda)
+coef(best_model)
+#L3-1
+tree.carseats=tree(Sales~.,data=data)
+summary(tree.carseats)
+#L3-L4-even
+require(tree)
+library(randomForest)
+set.seed(294)
+train <- sample(1:nrow(Carseats), nrow(Carseats) / 2)
+#L3-1
+tree.carseats=tree(Sales~.,data=data)
+#L3-1
+tree.carseats=tree(sales~.,data=data)
+#L3-1
+tree.carseats=tree(sales~ .,data=data)
+summary(tree.carseats)
+#L3-3
+plot(tree.carseats)
+text(tree.carseats,pretty=0)

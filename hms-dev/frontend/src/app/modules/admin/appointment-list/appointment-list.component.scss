@@ -1,0 +1,12 @@
+.appointment-grid {
+    grid-template-columns: auto 50px;
+    @screen sm {
+        grid-template-columns: 48px auto 112px 72px;
+    }
+    @screen md {
+        grid-template-columns: 600px 112px auto 112px 72px;
+    }
+    @screen lg {
+        grid-template-columns: 120px 150px 40px 200px 120px auto 120px;
+    }
+}

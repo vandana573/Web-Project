@@ -1,0 +1,35 @@
+[{
+  "_id": {
+    "$oid": "619099f0aca75d0bf3b28735"
+  },
+  "fullname": "Vandna Maddii",
+  "email": "vandna@gmail.com",
+  "password": "$2a$10$IFc7/c75tvCWJREHxXvs.e66JwZjvZIra9dbEYweoy7Yf7xt4pY86",
+  "contact_number": 9879836125,
+  "address": "missouri kansas",
+  "status": "1",
+  "role": "patient",
+  "birth_day": "2000-11-05T18:30:00.000Z",
+  "gender": "female",
+  "profileImgUrl": "https://avatar.oxro.io/avatar.svg?name=Vandna+Maddi&background=27038",
+  "updated_at": {
+    "$date": "2021-11-17T11:33:58.966Z"
+  }
+},{
+  "_id": {
+    "$oid": "619099f0aca75d0bf3b28736"
+  },
+  "fullname": "HMS System",
+  "email": "hms@google.com",
+  "password": "$2a$10$sgc7/Mvj/VLqaqo9T3WdUuKT88os7ad/xj3kXsssAf5o23udHLNCi",
+  "contact_number": 9879836125,
+  "address": "missouri kansas",
+  "status": "1",
+  "role": "admin",
+  "birth_day": "2000-01-27T18:30:00.000Z",
+  "gender": "female",
+  "profileImgUrl": "https://avatar.oxro.io/avatar.svg?name=Hms+System&background=27038",
+  "updated_at": {
+    "$date": "2021-11-17T11:33:32.780Z"
+  }
+}]

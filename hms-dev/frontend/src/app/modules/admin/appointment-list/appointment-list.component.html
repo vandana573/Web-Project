@@ -1,0 +1,388 @@
+<div
+    class="
+        sm:absolute sm:inset-0
+        flex flex-col flex-auto
+        min-w-0
+        sm:overflow-hidden
+        bg-card
+        dark:bg-transparent
+    "
+>
+    <!-- Header -->
+    <div class="dark bg-card dark:border-b">
+        <div class="flex flex-col w-full max-w-screen-xl mx-auto px-4 sm:px-6">
+            <div
+                class="
+                    flex flex-col
+                    sm:flex-row
+                    flex-auto
+                    sm:items-center
+                    min-w-0
+                    my-2
+                    sm:my-6
+                "
+            >
+                <div class="flex flex-auto items-center min-w-0">
+                    <div class="flex flex-col min-w-0 ml-4">
+                        <ng-container>
+                            <div
+                                class="
+                                    text-2xl
+                                    md:text-5xl
+                                    font-semibold
+                                    tracking-tight
+                                    leading-7
+                                    md:leading-snug
+                                    truncate
+                                "
+                            >
+                                Appointments!
+                            </div>
+                        </ng-container>
+                        <div class="flex items-center">
+                            <mat-icon class="icon-size-5">info</mat-icon>
+                            <div
+                                *ngIf="userD.role === 'admin'"
+                                class="ml-1.5 leading-6 truncate text-secondary"
+                            >
+                                All patients appointment with doctor name.
+                            </div>
+                            <div
+                                *ngIf="userD.role === 'patient'"
+                                class="ml-1.5 leading-6 truncate text-secondary"
+                            >
+                                All appointment with date and time.
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center mt-6 ml-8 sm:mt-0 sm:ml-4">
+                        <!-- Search -->
+                        <mat-form-field
+                            class="
+                                fuse-mat-dense fuse-mat-no-subscript
+                                min-w-50
+                            "
+                        >
+                            <mat-icon
+                                matPrefix
+                                [svgIcon]="'heroicons_outline:search'"
+                            ></mat-icon>
+                            <input
+                                matInput
+                                [formControl]="searchInputControl"
+                                [autocomplete]="'off'"
+                                [placeholder]="'Search '"
+                            />
+                        </mat-form-field>
+                    </div>
+                    <div class="flex items-center mt-6 ml-5 sm:mt-0 sm:ml-4">
+                        <mat-form-field
+                            class="
+                                fuse-mat-dense fuse-mat-no-subscript
+                                w-40
+                                ml-2
+                            "
+                        >
+                            <mat-select
+                                [value]="'all'"
+                                (selectionChange)="getDoctorsAppt($event.value)"
+                            >
+                                <mat-option [value]="'all'">All</mat-option>
+                                <ng-container *ngFor="let data of doctors">
+                                    <mat-option [value]="data._id">
+                                        {{ data.fullName }}
+                                    </mat-option>
+                                </ng-container>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main -->
+    <div class="flex flex-auto overflow-hidden">
+        <div
+            class="
+                flex flex-col flex-auto
+                sm:mb-18
+                overflow-hidden
+                sm:overflow-y-auto
+            "
+        >
+            <ng-container *ngIf="appointments.length > 0; else noAppointment">
+                <div class="grid">
+                    <!-- Header -->
+                    <div
+                        class="
+                            appointment-grid
+                            z-10
+                            sticky
+                            top-0
+                            grid
+                            gap-4
+                            py-4
+                            px-6
+                            md:px-8
+                            shadow
+                            text-md
+                            font-semibold
+                            text-secondary
+                            bg-gray-50
+                            dark:bg-black dark:bg-opacity-5
+                        "
+                        matSort
+                        matSortDisableClear
+                    >
+                        <div [mat-sort-header]="'apptNumber'">
+                            Appointment Number
+                        </div>
+                        <div [mat-sort-header]="'date'">Date</div>
+                        <div></div>
+                        <div [mat-sort-header]="'doctor_id'">Doctor Name</div>
+                        <div [mat-sort-header]="'user'">patient Name</div>
+                        <div [mat-sort-header]="'time_slot'">Time Slot</div>
+                        <div>Details</div>
+                        <!-- <div>Details</div> -->
+                    </div>
+                    <!-- Rows -->
+                    <ng-container
+                        *ngFor="
+                            let type of appointments;
+                            trackBy: trackByFn;
+                            let i = index
+                        "
+                    >
+                        <div
+                            class="
+                                appointment-grid
+                                grid
+                                items-center
+                                gap-4
+                                py-3
+                                px-6
+                                md:px-8
+                                border-b
+                            "
+                        >
+                            <!-- Name -->
+                            <div class="truncate">
+                                {{ type.apptNumber }}
+                            </div>
+                            <div class="truncate">
+                                {{ type.date | date: "MMM d, y" }}
+                            </div>
+                            <div class="truncate">
+                                <img
+                                    class="w-10 h-10 rounded-full mt-0"
+                                    [src]="
+                                        imgPath +
+                                        'doctors/' +
+                                        getDoctors(type.doctor_id)
+                                            ?.profileImgUrl
+                                    "
+                                    *ngIf="
+                                        getDoctors(type.doctor_id)
+                                            ?.profileImgUrl
+                                    "
+                                    onerror="this.src='../../assets/images/no-image-icon.png';
+                                                        type=''"
+                                />
+                            </div>
+                            <div class="truncate">
+                                {{ getDoctors(type.doctor_id)?.fullName }}
+                            </div>
+                            <div class="truncate">
+                                {{ type.user }}
+                            </div>
+
+                            <div class="truncate">
+                                {{ type.time_slot }}
+                            </div>
+                            <div class="flex items-center">
+                                <ng-container *ngFor="let data of type.reports">
+                                    <div
+                                        [matTooltip]="data.report_name"
+                                        class="
+                                            mx-0.5
+                                            w-2.5
+                                            h-2.5
+                                            rounded-full
+                                            bg-gray-500
+                                            cursor-pointer
+                                        "
+                                    ></div>
+                                </ng-container>
+                                <button
+                                    class="min-w-12 min-h-8 h-8 leading-6"
+                                    (click)="
+                                        openUploadReportPopup(
+                                            uploadReportTemplate,
+                                            type._id
+                                        )
+                                    "
+                                >
+                                    <mat-icon
+                                        class="ml-1 icon-size-6 text-green-600"
+                                        svgIcon="heroicons_outline:upload"
+                                        matTooltip="Upload Report"
+                                    >
+                                    </mat-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </ng-container>
+                </div>
+
+                <mat-paginator
+                    class="
+                        sm:absolute sm:inset-x-0 sm:bottom-0
+                        border-b
+                        sm:border-t sm:border-b-0
+                        z-10
+                        bg-gray-50
+                        dark:bg-transparent
+                    "
+                    [ngClass]="{ 'pointer-events-none': isLoading }"
+                    [length]="pagination.length"
+                    [pageIndex]="pagination.page"
+                    [pageSize]="pagination.size"
+                    [showFirstLastButtons]="true"
+                ></mat-paginator>
+            </ng-container>
+
+            <ng-template #uploadReportTemplate>
+                <form
+                    class="flex flex-col"
+                    [formGroup]="uploadReportForm"
+                    style="width: 350px"
+                >
+                    <div class="text-2xl font-semibold tracking-tight">
+                        Upload Patient's Report
+                    </div>
+
+                    <div class="flex flex-col mt-12">
+                        <div class="flex items-center">
+                            <mat-form-field
+                                class="fuse-mat-no-subscript w-full -mt-6"
+                                [floatLabel]="'always'"
+                            >
+                                <mat-label>Report Name</mat-label>
+                                <input
+                                    matInput
+                                    [formControlName]="'report_name'"
+                                    placeholder="Report Name"
+                                />
+                            </mat-form-field>
+                            <button
+                                class="min-w-10 min-h-7 h-12 ml-2 leading-6"
+                                mat-stroked-button
+                                (click)="selectDocument.click()"
+                            >
+                                <mat-icon
+                                    class="ml-1 icon-size-6 text-green-500"
+                                    svgIcon="heroicons_outline:upload"
+                                    title="Upload Report"
+                                >
+                                </mat-icon>
+                            </button>
+                            <input
+                                class="upload"
+                                name="image"
+                                type="file"
+                                hidden
+                                (change)="onFileUpload($event)"
+                                #selectDocument
+                            />
+                        </div>
+                        <div
+                            class="
+                                flex
+                                items-center
+                                w-full
+                                p-4
+                                rounded
+                                flex-col
+                                overflow-hidden
+                            "
+                            *ngIf="selectedReport"
+                        >
+                            <mat-icon
+                                class="ml-1 icon-size-6 text-green-400"
+                                svgIcon="heroicons_outline:check-circle"
+                                title="Upload Report"
+                            >
+                            </mat-icon>
+                            <span>Uploaded!</span>
+                        </div>
+                        <!-- <div
+                            class="
+                                w-full
+                                h-30
+                                p-4
+                                border
+                                rounded
+                                flex-col
+                                overflow-hidden
+                                fileselcet-center
+                                mt-4
+                            "
+                            *ngIf="selectedReport"
+                        >
+                            <ng-container *ngIf="selectedReport">
+                                <img
+                                    class="w-full h-full"
+                                    [src]="
+                                        imgPath + 'reports/' + selectedReport
+                                    "
+                                    onerror="this.src='../../assets/images/no-image-icon.png'; type=''"
+                                />
+                            </ng-container>
+                        </div> -->
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="ml-auto mt-8">
+                        <button
+                            mat-flat-button
+                            [disabled]="uploadReportForm.invalid"
+                            [color]="'primary'"
+                            (click)="done()"
+                        >
+                            Done
+                        </button>
+                    </div>
+                </form>
+            </ng-template>
+
+            <ng-template #noAppointment>
+                <div
+                    class="
+                        flex flex-auto flex-col
+                        items-center
+                        justify-center
+                        bg-gray-100
+                        dark:bg-transparent
+                    "
+                >
+                    <mat-icon
+                        class="icon-size-20"
+                        [svgIcon]="'iconsmind:file_search'"
+                    ></mat-icon>
+                    <div
+                        class="
+                            mt-6
+                            text-2xl
+                            font-semibold
+                            tracking-tight
+                            text-secondary
+                        "
+                    >
+                        No appointments found!
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </div>
+</div>
+<!-- This table is for patient dashboard-->
